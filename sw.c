@@ -81,6 +81,7 @@ int main(int argc, char *argv[]) {
     while (difftime(segundos, *inicio) > 0) {
         *inicio = time(NULL);
     }
+    system("mplayer -really-quiet mus.mp3");
     return 0;
 }
 
