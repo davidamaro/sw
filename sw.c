@@ -49,11 +49,10 @@ char getche(void)
   return getch_(1);
 }
 
-int formato( int tiempo);
 int filtro(char *cadena, int *tipo);
 void setTime(int valor, int *tipo, struct tm *tiempo);
 
-main() {
+int main(int argc, char *argv[]) {
     struct tm *fh;
     time_t segundos;
     time_t *inicio;
@@ -63,10 +62,17 @@ main() {
     tipo = (int *)malloc(sizeof(int));
     inicio = (time_t *)malloc(sizeof(time_t));
 
-    fgets(buffer, 80, stdin);
-    if (buffer[strlen(buffer) - 1] == '\n')
-        buffer[strlen(buffer) - 1] = 0;
-    valor = filtro(buffer, tipo);
+    if (argc != 2) {
+        printf("Ingrese el tiempo: ");
+        fgets(buffer, 80, stdin);
+        if (buffer[strlen(buffer) - 1] == '\n')
+                buffer[strlen(buffer) - 1] = 0;
+        valor = filtro(buffer, tipo);
+    }
+    else {
+        printf("Tiempo leído: %s\n", argv[1]);
+        valor = filtro(argv[1], tipo);
+    }
 
     *inicio = time(NULL);
     fh = localtime(inicio);
@@ -76,13 +82,6 @@ main() {
         *inicio = time(NULL);
     }
     return 0;
-}
-
-int formato( int tiempo) {
-    if (tiempo <= 0 )
-        return (59 + tiempo);
-    else
-        return tiempo;
 }
 
 int filtro(char *cadena, int *tipo) {
