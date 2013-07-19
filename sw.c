@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
     // Código para curses
     initscr();
     noecho();
-    cbreak();         // don't interrupt for user input
+    cbreak();         // don't interrupt for user input el inverso rompe la terminal
     timeout(500);     // wait 500ms for key press
     // Termina código para curses
     *inicio = time(NULL);
@@ -71,7 +71,6 @@ int main(int argc, char *argv[]) {
         printw("%d\n", (int)a);
     }
     endwin();
-    nocbreak();
     return 0;
 }
 
