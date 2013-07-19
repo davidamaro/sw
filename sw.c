@@ -5,49 +5,10 @@
 #include <string.h>
 #include <termios.h>
 #include <malloc.h>
+#include <curses.h>
 #define BUFSIZE 80
 #define false 0
 #define true 1
-
-static struct termios old, new;
-
-/* Initialize new terminal i/o settings */
-void initTermios(int echo) 
-{
-  tcgetattr(0, &old); /* grab old terminal i/o settings */
-  new = old; /* make new settings same as old settings */
-  new.c_lflag &= ~ICANON; /* disable buffered i/o */
-  new.c_lflag &= echo ? ECHO : ~ECHO; /* set echo mode */
-  tcsetattr(0, TCSANOW, &new); /* use these new terminal i/o settings now */
-}
-
-/* Restore old terminal i/o settings */
-void resetTermios(void) 
-{
-  tcsetattr(0, TCSANOW, &old);
-}
-
-/* Read 1 character - echo defines echo mode */
-char getch_(int echo) 
-{
-  char ch;
-  initTermios(echo);
-  ch = getchar();
-  resetTermios();
-  return ch;
-}
-
-/* Read 1 character without echo */
-char getch(void) 
-{
-  return getch_(0);
-}
-
-/* Read 1 character with echo */
-char getche(void) 
-{
-  return getch_(1);
-}
 
 int filtro(char *cadena, int *tipo);
 void setTime(int valor, int *tipo, struct tm *tiempo);
@@ -57,6 +18,8 @@ int main(int argc, char *argv[]) {
     time_t segundos;
     time_t *inicio;
     int valor, *tipo;
+    int c = 0;
+    double a = 0;
     char read;
     char buffer[BUFSIZE];
     tipo = (int *)malloc(sizeof(int));
@@ -74,14 +37,41 @@ int main(int argc, char *argv[]) {
         valor = filtro(argv[1], tipo);
     }
 
+    // Código para curses
+    initscr();
+    noecho();
+    cbreak();         // don't interrupt for user input
+    timeout(500);     // wait 500ms for key press
+    // Termina código para curses
     *inicio = time(NULL);
     fh = localtime(inicio);
     setTime(valor, tipo, fh);
     segundos = mktime(fh);
-    while (difftime(segundos, *inicio) > 0) {
+    int s = 0;
+    while ((a = difftime(segundos, *inicio)) > 0) {
         *inicio = time(NULL);
+        int c = getch();
+        switch (c) {
+            case 's':
+                endwin();
+                nocbreak();
+                return 0;
+            case ' ':
+                if (s == 1)
+                    s = 0;
+                else
+                    s = 1;
+                break;
+            default:
+                break;
+        }
+        if (s) {
+            segundos = *inicio + (int) a;
+        }
+        printw("%d\n", (int)a);
     }
-    system("mplayer -really-quiet mus.mp3");
+    endwin();
+    nocbreak();
     return 0;
 }
 
