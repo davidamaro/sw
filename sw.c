@@ -33,7 +33,6 @@ int main(int argc, char *argv[]) {
         valor = filtro(buffer, tipo);
     }
     else {
-        printf("Tiempo leído: %s\n", argv[1]);
         valor = filtro(argv[1], tipo);
     }
 
