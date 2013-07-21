@@ -48,11 +48,9 @@ int main(int argc, char *argv[]) {
     setTime(valor, tipo, fh);
     segundos = mktime(fh);
     int s = 0;
-    move(0,0);
-    printw("Tiempo inicial: %s", ctime(inicio));
+    mvprintw(0,0,"Tiempo inicial: %s", ctime(inicio));
     while ((a = difftime(segundos, *inicio)) > 0) {
-        move(1,0);
-        printw("Tiempo final: %s", ctime(&segundos));
+        mvprintw(1,0,"Tiempo final:   %s", ctime(&segundos));
         *inicio = time(NULL);
         int c = getch();
         switch (c) {
@@ -73,8 +71,7 @@ int main(int argc, char *argv[]) {
         if (s) {
             segundos = *inicio + (int) a;
         }
-        move(2,0);
-        printw("Segundos restantes: %d\n", (int)a);
+        mvprintw(2,0,"Segundos restantes: %d\n", (int)a);
     }
     endwin();
     return 0;
