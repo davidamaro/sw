@@ -12,37 +12,32 @@
 
 int filtro(char *cadena, int *tipo);
 void setTime(int valor, int *tipo, struct tm *tiempo);
+void getValue(char *buffer);
 
 int main(int argc, char *argv[]) {
     struct tm *fh;
-    time_t segundos;
-    time_t *inicio;
+    time_t final;
+    time_t *actual;
     int valor, *tipo;
     int c = 0;
-    double a = 0;
+    double diferencia = 0;
     char read;
     char buffer[BUFSIZE];
     tipo = (int *)malloc(sizeof(int));
-    inicio = (time_t *)malloc(sizeof(time_t));
+    actual = (time_t *)malloc(sizeof(time_t));
 
     if (argc != 3) {
         if (argc != 2) {
             printf("Ingrese el tiempo: ");
-            fgets(buffer, 80, stdin);
-            if (buffer[strlen(buffer) - 1] == '\n')
-                    buffer[strlen(buffer) - 1] = 0;
+            getValue(buffer);
             valor = filtro(buffer, tipo);
             printf("Ingrese la tarea:  ");
-            fgets(buffer, 80, stdin);
-            if (buffer[strlen(buffer) - 1] == '\n')
-                    buffer[strlen(buffer) - 1] = 0;
+            getValue(buffer);
         }
         else {
             valor = filtro(argv[1], tipo);
             printf("Ingrese la tarea:  ");
-            fgets(buffer, 80, stdin);
-            if (buffer[strlen(buffer) - 1] == '\n')
-                    buffer[strlen(buffer) - 1] = 0;
+            getValue(buffer);
         }
     }
     else {
@@ -56,16 +51,16 @@ int main(int argc, char *argv[]) {
     cbreak();         // don't interrupt for user input el inverso rompe la terminal
     timeout(500);     // wait 500ms for key press
     // Termina código para curses
-    *inicio = time(NULL);
-    fh = localtime(inicio);
+    *actual = time(NULL);
+    fh = localtime(actual);
     setTime(valor, tipo, fh);
-    segundos = mktime(fh);
+    final = mktime(fh);
     int s = 0;
-    mvprintw(0,0,"Tiempo inicial: %s", ctime(inicio));
+    mvprintw(0,0,"Tiempo inicial: %s", ctime(actual));
     mvprintw(5,0,"Tarea: %s", buffer);
-    while ((a = difftime(segundos, *inicio)) > 0) {
-        mvprintw(1,0,"Tiempo final:   %s", ctime(&segundos));
-        *inicio = time(NULL);
+    while ((diferencia = difftime(final, *actual)) > 0) {
+        mvprintw(1,0,"Tiempo final:   %s", ctime(&final));
+        *actual = time(NULL);
         int c = getch();
         switch (c) {
             case 's':
@@ -86,9 +81,9 @@ int main(int argc, char *argv[]) {
                 break;
         }
         if (s) {
-            segundos = *inicio + (int) a;
+            final = *actual + (int) diferencia;
         }
-        mvprintw(2,0,"Segundos restantes: %d\n", (int)a);
+        mvprintw(2,0,"Segundos restantes: %d\n", (int)diferencia);
     }
     endwin();
     return 0;
@@ -123,4 +118,10 @@ void setTime(int valor, int *tipo, struct tm *tiempo) {
     if (*tipo == 3)
         tiempo->tm_hour += valor;
     saludo = mktime(tiempo);
+}
+
+void getValue(char *buffer) {
+    fgets(buffer, BUFSIZE, stdin);
+    if (buffer[strlen(buffer) - 1] == '\n')
+            buffer[strlen(buffer) - 1] = 0;
 }
