@@ -60,10 +60,13 @@ int main(int argc, char *argv[]) {
                 return 0;
             case ' ':
                 if (s == 1) {
+                    mvprintw(3,0,"       ");
                     s = 0;
                 }
-                else
+                else {
                     s = 1;
+                    mvprintw(3,0,"Pausado");
+                }
                 break;
             default:
                 break;
