@@ -25,15 +25,29 @@ int main(int argc, char *argv[]) {
     tipo = (int *)malloc(sizeof(int));
     inicio = (time_t *)malloc(sizeof(time_t));
 
-    if (argc != 2) {
-        printf("Ingrese el tiempo: ");
-        fgets(buffer, 80, stdin);
-        if (buffer[strlen(buffer) - 1] == '\n')
-                buffer[strlen(buffer) - 1] = 0;
-        valor = filtro(buffer, tipo);
+    if (argc != 3) {
+        if (argc != 2) {
+            printf("Ingrese el tiempo: ");
+            fgets(buffer, 80, stdin);
+            if (buffer[strlen(buffer) - 1] == '\n')
+                    buffer[strlen(buffer) - 1] = 0;
+            valor = filtro(buffer, tipo);
+            printf("Ingrese la tarea:  ");
+            fgets(buffer, 80, stdin);
+            if (buffer[strlen(buffer) - 1] == '\n')
+                    buffer[strlen(buffer) - 1] = 0;
+        }
+        else {
+            valor = filtro(argv[1], tipo);
+            printf("Ingrese la tarea:  ");
+            fgets(buffer, 80, stdin);
+            if (buffer[strlen(buffer) - 1] == '\n')
+                    buffer[strlen(buffer) - 1] = 0;
+        }
     }
     else {
         valor = filtro(argv[1], tipo);
+        strcpy(buffer, argv[2]);
     }
 
     // Código para curses
@@ -48,6 +62,7 @@ int main(int argc, char *argv[]) {
     segundos = mktime(fh);
     int s = 0;
     mvprintw(0,0,"Tiempo inicial: %s", ctime(inicio));
+    mvprintw(5,0,"Tarea: %s", buffer);
     while ((a = difftime(segundos, *inicio)) > 0) {
         mvprintw(1,0,"Tiempo final:   %s", ctime(&segundos));
         *inicio = time(NULL);
@@ -85,11 +100,9 @@ int filtro(char *cadena, int *tipo) {
         return 1;
     int segundo = false, minuto = false,
         hora = false;
-    for (i = 0; i < 3; i++) {
-        if (cadena[2] == 's') segundo = true;
-        if (cadena[2] == 'm') minuto  = true;
-        if (cadena[2] == 'h') hora    = true;
-    }
+    if (cadena[2] == 's') segundo = true;
+    if (cadena[2] == 'm') minuto  = true;
+    if (cadena[2] == 'h') hora    = true;
     cadena[2] = 0;
     num = atoi(cadena);
     if (segundo)
