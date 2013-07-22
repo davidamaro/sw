@@ -1,6 +1,11 @@
 README
 ======
 
+Compilation
+-----------
+
+`cc sw.c -o sw -lncurses`
+
 Usage
 -----
 
