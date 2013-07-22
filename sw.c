@@ -103,23 +103,17 @@ int filtro(char *cadena, int *tipo) {
     if (cadena[2] == 'h') hora    = true;
     cadena[2] = 0;
     num = atoi(cadena);
-    if (segundo)
-        *tipo = 1;
-    if (minuto)
-        *tipo = 2;
-    if (hora)
-        *tipo = 3;
+    if (segundo) *tipo = 1;
+    if (minuto) *tipo = 2;
+    if (hora) *tipo = 3;
     return num;
 }
 
 void setTime(int valor, int *tipo, struct tm *tiempo) {
     time_t saludo;
-    if (*tipo == 1)
-        tiempo->tm_sec += valor;
-    if (*tipo == 2)
-        tiempo->tm_min += valor;
-    if (*tipo == 3)
-        tiempo->tm_hour += valor;
+    if (*tipo == 1) tiempo->tm_sec += valor;
+    if (*tipo == 2) tiempo->tm_min += valor;
+    if (*tipo == 3) tiempo->tm_hour += valor;
     saludo = mktime(tiempo);
 }
 
