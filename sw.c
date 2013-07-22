@@ -65,7 +65,8 @@ int main(int argc, char *argv[]) {
         switch (c) {
             case 's':
                 endwin();
-                nocbreak();
+                free(tipo);
+                free(actual);
                 return 0;
             case ' ':
                 if (s == 1) {
@@ -86,6 +87,8 @@ int main(int argc, char *argv[]) {
         mvprintw(2,0,"Segundos restantes: %d\n", (int)diferencia);
     }
     endwin();
+    free(tipo);
+    free(actual);
     return 0;
 }
 
