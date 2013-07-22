@@ -15,7 +15,7 @@ void setTime(int valor, int *tipo, struct tm *tiempo);
 void getValue(char *buffer);
 
 int main(int argc, char *argv[]) {
-    struct tm *fh;
+    struct tm *tiempo;
     time_t final;
     time_t *actual;
     int valor, *tipo;
@@ -23,6 +23,7 @@ int main(int argc, char *argv[]) {
     double diferencia = 0;
     char read;
     char buffer[BUFSIZE];
+
     tipo = (int *)malloc(sizeof(int));
     actual = (time_t *)malloc(sizeof(time_t));
 
@@ -45,16 +46,14 @@ int main(int argc, char *argv[]) {
         strcpy(buffer, argv[2]);
     }
 
-    // Código para curses
     initscr();
     noecho();
     cbreak();         // don't interrupt for user input el inverso rompe la terminal
     timeout(500);     // wait 500ms for key press
-    // Termina código para curses
     *actual = time(NULL);
-    fh = localtime(actual);
-    setTime(valor, tipo, fh);
-    final = mktime(fh);
+    tiempo = localtime(actual);
+    setTime(valor, tipo, tiempo);
+    final = mktime(tiempo);
     int s = 0;
     mvprintw(0,0,"Tiempo inicial: %s", ctime(actual));
     mvprintw(5,0,"Tarea: %s", buffer);
@@ -110,11 +109,9 @@ int filtro(char *cadena, int *tipo) {
 }
 
 void setTime(int valor, int *tipo, struct tm *tiempo) {
-    time_t saludo;
     if (*tipo == 1) tiempo->tm_sec += valor;
     if (*tipo == 2) tiempo->tm_min += valor;
     if (*tipo == 3) tiempo->tm_hour += valor;
-    saludo = mktime(tiempo);
 }
 
 void getValue(char *buffer) {
