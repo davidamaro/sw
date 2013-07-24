@@ -4,7 +4,7 @@ README
 Compilation
 -----------
 
-`cc sw.c -o sw -lncurses`
+`cc -Wall -Wextra -O2 sw.c -o sw -lncurses`
 
 Usage
 -----

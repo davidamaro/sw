@@ -1,8 +1,10 @@
-/* sw2.c
+/* Simple stopwatch written in C
+ * sw.c
  */
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <stdlib.h>
 #include <termios.h>
 #include <malloc.h>
 #include <curses.h>
@@ -11,7 +13,7 @@
 #define true 1
 
 int filtro(char *cadena, int *tipo);
-void setTime(int valor, int *tipo, struct tm *tiempo);
+void setTime(int *valor, int *tipo, struct tm *tiempo);
 void getValue(char *buffer);
 
 int main(int argc, char *argv[]) {
@@ -19,9 +21,7 @@ int main(int argc, char *argv[]) {
     time_t final;
     time_t *actual;
     int valor, *tipo;
-    int c = 0;
     double diferencia = 0;
-    char read;
     char buffer[BUFSIZE];
 
     tipo = (int *)malloc(sizeof(int));
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
     timeout(500);     // wait 500ms for key press
     *actual = time(NULL);
     tiempo = localtime(actual);
-    setTime(valor, tipo, tiempo);
+    setTime(&valor, tipo, tiempo);
     final = mktime(tiempo);
     int s = 0;
     mvprintw(0,0,"Tiempo inicial: %s", ctime(actual));
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
 }
 
 int filtro(char *cadena, int *tipo) {
-    int i = 0, num = 0;
+    int num = 0;
     if (strlen(cadena) != 3)
         return 1;
     int segundo = false, minuto = false,
@@ -103,15 +103,15 @@ int filtro(char *cadena, int *tipo) {
     cadena[2] = 0;
     num = atoi(cadena);
     if (segundo) *tipo = 1;
-    if (minuto) *tipo = 2;
-    if (hora) *tipo = 3;
+    if (minuto)  *tipo = 2;
+    if (hora)    *tipo = 3;
     return num;
 }
 
-void setTime(int valor, int *tipo, struct tm *tiempo) {
-    if (*tipo == 1) tiempo->tm_sec += valor;
-    if (*tipo == 2) tiempo->tm_min += valor;
-    if (*tipo == 3) tiempo->tm_hour += valor;
+void setTime(int *valor, int *tipo, struct tm *tiempo) {
+    if (*tipo == 1) tiempo->tm_sec  += *valor;
+    if (*tipo == 2) tiempo->tm_min  += *valor;
+    if (*tipo == 3) tiempo->tm_hour += *valor;
 }
 
 void getValue(char *buffer) {
