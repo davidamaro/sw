@@ -85,6 +85,7 @@ int main(int argc, char *argv[]) {
         }
         mvprintw(2,0,"Segundos restantes: %d\n", (int)diferencia);
     }
+    system("zenity --info --text='El tiempo se acabó'");
     endwin();
     free(tipo);
     free(actual);
