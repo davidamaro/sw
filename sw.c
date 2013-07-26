@@ -12,6 +12,7 @@
 #define false 0
 #define true 1
 
+void eleccion(int *menu, int *c, int *tipo, time_t *actual);
 int filtro(char *cadena, int *tipo);
 void setTime(int *valor, int *tipo, struct tm *tiempo);
 void getValue(char *buffer);
@@ -26,6 +27,9 @@ int main(int argc, char *argv[]) {
 
     tipo = (int *)malloc(sizeof(int));
     actual = (time_t *)malloc(sizeof(time_t));
+    int *s = NULL;
+    s = (int *)malloc(sizeof(int));
+    *s = 0;
 
     if (argc != 3) {
         if (argc != 2) {
@@ -58,39 +62,21 @@ int main(int argc, char *argv[]) {
     tiempo = localtime(actual);
     setTime(&valor, tipo, tiempo);
     final = mktime(tiempo);
-    int s = 0;
     mvprintw(0,0,"Tiempo inicial: %s", ctime(actual));
     mvprintw(5,0,"Tarea: %s", buffer);
     while ((diferencia = difftime(final, *actual)) > 0) {
         mvprintw(1,0,"Tiempo final:   %s", ctime(&final));
         *actual = time(NULL);
         int c = getch();
-        switch (c) {
-            case 's':
-                endwin();
-                free(tipo);
-                free(actual);
-                return 0;
-            case ' ':
-                if (s == 1) {
-                    mvprintw(3,0,"       ");
-                    s = 0;
-                }
-                else {
-                    s = 1;
-                    mvprintw(3,0,"Pausado");
-                }
-                break;
-            default:
-                break;
-        }
-        if (s) {
+        eleccion(s, &c, tipo, actual);
+        if (*s) {
             final = *actual + (int) diferencia;
         }
         mvprintw(2,0,"Segundos restantes: %d\n", (int)diferencia);
     }
-    system("zenity --info --text='El tiempo se acabó'");
+    //system("zenity --info --text='El tiempo se acabó'");
     endwin();
+    free(s);
     free(tipo);
     free(actual);
     return 0;
@@ -123,4 +109,26 @@ void getValue(char *buffer) {
     fgets(buffer, BUFSIZE, stdin);
     if (buffer[strlen(buffer) - 1] == '\n')
             buffer[strlen(buffer) - 1] = 0;
+}
+
+void eleccion(int *menu, int *c, int *tipo, time_t *actual) {
+    switch (*c) {
+        case 's':
+            endwin();
+            free(tipo);
+            free(actual);
+            exit(-1);
+        case ' ':
+            if (*menu == 1) {
+                mvprintw(3,0,"       ");
+                *menu = 0;
+            }
+            else {
+                *menu = 1;
+                mvprintw(3,0,"Pausado");
+            }
+            break;
+        default:
+            break;
+    }
 }
