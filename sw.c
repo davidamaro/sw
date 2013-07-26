@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     struct tm *tiempo;
     time_t final;
     time_t *actual;
-    int valor, *tipo;
+    int valor = 20, *tipo = NULL;
     double diferencia = 0;
     char buffer[BUFSIZE];
 
@@ -29,16 +29,20 @@ int main(int argc, char *argv[]) {
 
     if (argc != 3) {
         if (argc != 2) {
-            printf("Ingrese el tiempo: ");
-            getValue(buffer);
-            valor = filtro(buffer, tipo);
-            printf("Ingrese la tarea:  ");
-            getValue(buffer);
+            //printf("Ingrese el tiempo: ");
+            //getValue(buffer);
+            //valor = filtro(buffer, tipo);
+            //printf("Ingrese la tarea:  ");
+            //getValue(buffer);
+            strcpy(buffer, "Tarea no definida.");
+            valor = 20;
+            *tipo = 2;
         }
         else {
-            valor = filtro(argv[1], tipo);
-            printf("Ingrese la tarea:  ");
-            getValue(buffer);
+//            valor = filtro(argv[1], tipo);
+//            printf("Ingrese la tarea:  ");
+//            getValue(buffer);
+            strcpy(buffer, "Tarea no definida.");
         }
     }
     else {
