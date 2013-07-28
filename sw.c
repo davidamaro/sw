@@ -1,4 +1,5 @@
-/* Simple stopwatch written in C
+/* 
+ * Simple stopwatch written in C
  * sw.c
  */
 #include <stdio.h>
@@ -8,6 +9,7 @@
 #include <termios.h>
 #include <malloc.h>
 #include <curses.h>
+#include <getopt.h>
 #define false 0
 #define true 1
 
@@ -26,39 +28,31 @@ int main(int argc, char *argv[]) {
     sesion = (int *)malloc(sizeof(int));
     *sesion = 0;
 
-    int i = 0;
+    int long_index = 0;
+    int opt = 0;
     int longitud = 0;
     char tipo = 'm';
     char *tarea = NULL;
-    for (i = 0; i < argc; i++) {
-        if (strlen(argv[i]) > 2 ) {
-            if (strncmp(argv[i], "-s", 2) == 0) {
-                longitud = strlen(argv[i]);
+    static struct option long_options[] = {
+        {"tiempo", required_argument, 0, 't'},
+        {"tarea",  required_argument, 0, 's'},
+        {0,        0,                 0,  0}
+    };
+    while ((opt = getopt_long(argc, argv, "t:s:",
+                    long_options, &long_index)) != -1) {
+        switch(opt) {
+            case 't':
+                valor = atoi(optarg);
+                tipo = *(optarg + strlen(optarg) - 1);
+                break;
+            case 's':
+                longitud = strlen(optarg);
                 tarea = (char *)malloc(longitud + 1);
-                strcpy(tarea, argv[i] + 2);
-            }
-            if (strncmp(argv[i], "-t", 2) == 0) {
-                tipo = *(argv[i] + strlen(argv[i]) - 1);
-                *(argv[i] + strlen(argv[i]) - 1) = 0;
-                valor = atoi(argv[i] + 2);
-            }
-        }
-        if (strlen(argv[i]) == 2 && // sea un identificador de argumento
-            strlen(argv[i + 1])) {  // exista el siguiente argumento
-            if (strcmp(argv[i], "-t") == 0) {
-                tipo = *(argv[i + 1] + strlen(argv[i + 1]) - 1);
-                *(argv[i + 1] + strlen(argv[i + 1]) - 1) = 0;
-                valor = atoi(argv[i + 1]);
-            }
-            if (strcmp(argv[i], "-s") == 0) {
-                longitud = strlen(argv[i + 1]);
-                tarea = (char *)malloc(longitud + 1);
-                strcpy(tarea, argv[i + 1]);
-            }
-            i++;
+                strcpy(tarea, optarg);
+            default:
+                break;
         }
     }
-
     initscr();
     noecho();
     cbreak();         // don't interrupt for user input el inverso rompe la terminal
@@ -90,9 +84,13 @@ int main(int argc, char *argv[]) {
 }
 
 void setTime(int *valor, char *tipo, struct tm *tiempo) {
-    if (*tipo == 's') tiempo->tm_sec  += *valor;
-    if (*tipo == 'm') tiempo->tm_min  += *valor;
-    if (*tipo == 'h') tiempo->tm_hour += *valor;
+    if (*tipo == 's' || *tipo == 'm' || *tipo == 'h') {
+        if (*tipo == 's') tiempo->tm_sec  += *valor;
+        if (*tipo == 'm') tiempo->tm_min  += *valor;
+        if (*tipo == 'h') tiempo->tm_hour += *valor;
+    }
+    // si no se ingresa el tipo, segundos
+    else              tiempo->tm_sec  += *valor;
 }
 
 void eleccion(int *menu, int *c, time_t *actual) {
