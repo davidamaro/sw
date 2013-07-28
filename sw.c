@@ -8,50 +8,55 @@
 #include <termios.h>
 #include <malloc.h>
 #include <curses.h>
-#define BUFSIZE 80
 #define false 0
 #define true 1
 
-void eleccion(int *menu, int *c, int *tipo, time_t *actual);
-int filtro(char *cadena, int *tipo);
-void setTime(int *valor, int *tipo, struct tm *tiempo);
-void getValue(char *buffer);
+void eleccion(int *menu, int *c, time_t *actual);
+void setTime(int *valor, char *tipo, struct tm *tiempo);
 
 int main(int argc, char *argv[]) {
     struct tm *tiempo;
     time_t final;
     time_t *actual;
-    int valor = 20, *tipo = NULL;
+    int valor = 20;
     double diferencia = 0;
-    char buffer[BUFSIZE];
 
-    tipo = (int *)malloc(sizeof(int));
     actual = (time_t *)malloc(sizeof(time_t));
-    int *s = NULL;
-    s = (int *)malloc(sizeof(int));
-    *s = 0;
+    int *sesion = NULL;
+    sesion = (int *)malloc(sizeof(int));
+    *sesion = 0;
 
-    if (argc != 3) {
-        if (argc != 2) {
-            //printf("Ingrese el tiempo: ");
-            //getValue(buffer);
-            //valor = filtro(buffer, tipo);
-            //printf("Ingrese la tarea:  ");
-            //getValue(buffer);
-            strcpy(buffer, "Tarea no definida.");
-            valor = 20;
-            *tipo = 2;
+    int i = 0;
+    int longitud = 0;
+    char tipo = 'm';
+    char *tarea = NULL;
+    for (i = 0; i < argc; i++) {
+        if (strlen(argv[i]) > 2 ) {
+            if (strncmp(argv[i], "-s", 2) == 0) {
+                longitud = strlen(argv[i]);
+                tarea = (char *)malloc(longitud + 1);
+                strcpy(tarea, argv[i] + 2);
+            }
+            if (strncmp(argv[i], "-t", 2) == 0) {
+                tipo = *(argv[i] + strlen(argv[i]) - 1);
+                *(argv[i] + strlen(argv[i]) - 1) = 0;
+                valor = atoi(argv[i] + 2);
+            }
         }
-        else {
-//            valor = filtro(argv[1], tipo);
-//            printf("Ingrese la tarea:  ");
-//            getValue(buffer);
-            strcpy(buffer, "Tarea no definida.");
+        if (strlen(argv[i]) == 2 && // sea un identificador de argumento
+            strlen(argv[i + 1])) {  // exista el siguiente argumento
+            if (strcmp(argv[i], "-t") == 0) {
+                tipo = *(argv[i + 1] + strlen(argv[i + 1]) - 1);
+                *(argv[i + 1] + strlen(argv[i + 1]) - 1) = 0;
+                valor = atoi(argv[i + 1]);
+            }
+            if (strcmp(argv[i], "-s") == 0) {
+                longitud = strlen(argv[i + 1]);
+                tarea = (char *)malloc(longitud + 1);
+                strcpy(tarea, argv[i + 1]);
+            }
+            i++;
         }
-    }
-    else {
-        valor = filtro(argv[1], tipo);
-        strcpy(buffer, argv[2]);
     }
 
     initscr();
@@ -60,63 +65,42 @@ int main(int argc, char *argv[]) {
     timeout(500);     // wait 500ms for key press
     *actual = time(NULL);
     tiempo = localtime(actual);
-    setTime(&valor, tipo, tiempo);
+    setTime(&valor, &tipo, tiempo);
     final = mktime(tiempo);
     mvprintw(0,0,"Tiempo inicial: %s", ctime(actual));
-    mvprintw(5,0,"Tarea: %s", buffer);
+    if (tarea == NULL)
+        tarea = "Tarea no especificada.";
+    mvprintw(5,0,"Tarea: %s", tarea);
     while ((diferencia = difftime(final, *actual)) > 0) {
         mvprintw(1,0,"Tiempo final:   %s", ctime(&final));
         *actual = time(NULL);
         int c = getch();
-        eleccion(s, &c, tipo, actual);
-        if (*s) {
+        eleccion(sesion, &c, actual);
+        if (*sesion) {
             final = *actual + (int) diferencia;
         }
         mvprintw(2,0,"Segundos restantes: %d\n", (int)diferencia);
     }
-    //system("zenity --info --text='El tiempo se acabó'");
     endwin();
-    free(s);
-    free(tipo);
-    free(actual);
+    if (sesion != NULL)
+        free(sesion);
+    if (actual != NULL)
+        free(actual);
     return 0;
 }
 
-int filtro(char *cadena, int *tipo) {
-    int num = 0;
-    if (strlen(cadena) != 3)
-        return 1;
-    int segundo = false, minuto = false,
-        hora = false;
-    if (cadena[2] == 's') segundo = true;
-    if (cadena[2] == 'm') minuto  = true;
-    if (cadena[2] == 'h') hora    = true;
-    cadena[2] = 0;
-    num = atoi(cadena);
-    if (segundo) *tipo = 1;
-    if (minuto)  *tipo = 2;
-    if (hora)    *tipo = 3;
-    return num;
+void setTime(int *valor, char *tipo, struct tm *tiempo) {
+    if (*tipo == 's') tiempo->tm_sec  += *valor;
+    if (*tipo == 'm') tiempo->tm_min  += *valor;
+    if (*tipo == 'h') tiempo->tm_hour += *valor;
 }
 
-void setTime(int *valor, int *tipo, struct tm *tiempo) {
-    if (*tipo == 1) tiempo->tm_sec  += *valor;
-    if (*tipo == 2) tiempo->tm_min  += *valor;
-    if (*tipo == 3) tiempo->tm_hour += *valor;
-}
-
-void getValue(char *buffer) {
-    fgets(buffer, BUFSIZE, stdin);
-    if (buffer[strlen(buffer) - 1] == '\n')
-            buffer[strlen(buffer) - 1] = 0;
-}
-
-void eleccion(int *menu, int *c, int *tipo, time_t *actual) {
+void eleccion(int *menu, int *c, time_t *actual) {
     switch (*c) {
         case 's':
             endwin();
-            free(tipo);
-            free(actual);
+            if (actual != NULL)
+                free(actual);
             exit(-1);
         case ' ':
             if (*menu == 1) {
