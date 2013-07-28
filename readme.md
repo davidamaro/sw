@@ -1,3 +1,5 @@
+__sw__ is a very simple stopwatch that work in commandline
+
 README
 ======
 
@@ -9,6 +11,4 @@ Compilation
 Usage
 -----
 
-sw *[time]* *[task]*
-
-Note. [time] must have three characters, i.e, one minute == 01m.
+sw [-t_time passed_] [-s_task passed_]
