@@ -26,7 +26,7 @@ void eleccion(int *menu, int *c, time_t *actual) {
     case 's':
       endwin();
       if (actual != NULL) free(actual);
-      exit(-1);
+      exit(EXIT_FAILURE);
     case ' ':
       if (*menu) {
         mvprintw(3,0,"     ");
@@ -103,10 +103,10 @@ int main(int argc, char *argv[]) {
     if (*sesion) {
       final = *actual + (int) diferencia;
     }
-    mvprintw(2,0,"Segundos restantes: %d\n", (int) diferencia);
+    mvprintw(2,0,"Tiempo actual:  %s", ctime(actual));
   }
   endwin();
   if (sesion != NULL) free(sesion);
   if (actual != NULL) free(actual);
-  return 0;
+  exit(EXIT_SUCCESS);
 }
